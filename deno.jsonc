@@ -12,8 +12,6 @@
     "test": "deno test --allow-all --junit-path reports/junit.xml --coverage=reports/coverage/ --coverage-raw-data-only",    
     // runs coverage twice - once for showing a table in terminal, once for generating lcov file for codecov
     "run-coverage": "deno coverage reports/coverage/ --include=$(pwd) && deno coverage reports/coverage/ --include=$(pwd) --lcov --output=reports/coverage.lcov",    
-    "compile": "deno compile --output $OUTPUT_FILE_NAME --allow-env --allow-net=api.github.com --allow-run --allow-read --allow-write --target $DENO_TARGET index.ts",
-    "compile-all": "OUTPUT_FILE_NAME=dist/bin-x86_64-Linux DENO_TARGET=x86_64-unknown-linux-gnu deno task compile && OUTPUT_FILE_NAME=dist/bin-aarch64-Linux DENO_TARGET=aarch64-unknown-linux-gnu deno task compile && OUTPUT_FILE_NAME=dist/bin-x86_64-Darwin DENO_TARGET=x86_64-apple-darwin deno task compile && OUTPUT_FILE_NAME=dist/bin-aarch64-Darwin DENO_TARGET=aarch64-apple-darwin deno task compile",
     "format": "deno fmt",
     "lint": "deno fmt && deno lint --fix"
   },
