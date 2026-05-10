@@ -1,0 +1,34 @@
+on: 
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-action:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # If your deploy script that you write needs to push a git commit, git tag, or create a GitHub Release.
+      pull-requests: write # If you enable pull request comments (they are enabled by default).
+      id-token: write # required by npm for publishing package
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 'lts/*'
+      
+      # install deno to run the decaf scripts in my deploy script.
+      # some of the scripts have broken npx or curl install bugs so deno is required to run them.
+      - uses: denoland/setup-deno@v2
+
+      - uses: levibostian/decaf@9fcdab2d464a54521f93440f2d348b6219c4d4db # 0.14.0
+        env:
+          # required to use 'gh' CLI in my step scripts. 
+          GH_TOKEN: ${{ github.token }}      
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          get_latest_release_current_branch: deno run --allow-all --quiet jsr:@levibostian/decaf-script-github-releases get
+          get_next_release_version: deno run --allow-all --quiet jsr:@levibostian/decaf-script-conventional-commits
+          deploy: |
+            ./scripts/build-release-assets.sh
+            deno run --quiet --allow-all jsr:@levibostian/decaf-script-github-releases set-github-release-assets dist/pr-updater-x86_64-unknown-linux-gnu.tar.gz#pr-updater-x86_64-unknown-linux-gnu.tar.gz dist/pr-updater-aarch64-unknown-linux-gnu.tar.gz#pr-updater-aarch64-unknown-linux-gnu.tar.gz dist/pr-updater-x86_64-apple-darwin.tar.gz#pr-updater-x86_64-apple-darwin.tar.gz dist/pr-updater-aarch64-apple-darwin.tar.gz#pr-updater-aarch64-apple-darwin.tar.gz
+            deno run --allow-all --quiet jsr:@levibostian/decaf-script-github-releases set
