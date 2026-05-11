@@ -18,3 +18,4 @@ Otherwise, feel free to download a pre-compiled binary from [the releases page](
 | `order` | Suggests a git merge order to update open PRs based on their relationships. | `pr-updater order` |
 | `stack` | Displays the stacks of open PRs. | `pr-updater stack` |
 | `merge` | Merges one branch into another and optionally auto-resolves conflicts. | `pr-updater merge --base main --head feature/one --resolve-cmd "resolve-merge-conflicts" --merge-arg --no-ff` |
+| `update` | Runs `order` then merges each suggested pair, optionally pushing results. | `pr-updater update --resolve-cmd "resolve-merge-conflicts" --merge-arg --no-ff --push` |

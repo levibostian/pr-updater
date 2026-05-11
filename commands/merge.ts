@@ -1,4 +1,5 @@
 import $ from "@david/dax"
+import { fail, ok, type RunCommandResult } from "./run_command_result.ts"
 
 type MergeOptions = {
   base: string
@@ -17,38 +18,33 @@ const isMergeInProgress = async () => {
   return result.code === 0
 }
 
-export const runMerge = async (options: MergeOptions) => {
+export const runMerge = async (options: MergeOptions): Promise<RunCommandResult> => {
   const { base, head, resolveCmd, mergeArgs } = options
 
-  if (!base || !head) {
-    console.log("Missing required args: --base and --head.")
-    Deno.exit(1)
-  }
-
   const checkout = await $`git checkout ${base}`.noThrow()
-  if (checkout.code !== 0) Deno.exit(1)
+  if (checkout.code !== 0) return fail()
 
   const merge = await $`git merge ${mergeArgs} ${head}`.noThrow()
   const conflictsAfterMerge = await hasConflicts()
 
-  if (!conflictsAfterMerge && merge.code !== 0) Deno.exit(1)
+  if (!conflictsAfterMerge && merge.code !== 0) return fail()
 
   if (conflictsAfterMerge) {
-    if (!resolveCmd) Deno.exit(1)
+    if (!resolveCmd) return fail("Merge conflicts detected. Provide --resolve-cmd to continue.")
 
     const resolveCode = await $`bash -c ${resolveCmd}`.noThrow()
-    if (resolveCode.code !== 0) Deno.exit(1)
+    if (resolveCode.code !== 0) return fail("Resolve command failed.")
 
     const add = await $`git add -A`.noThrow()
-    if (add.code !== 0) Deno.exit(1)
+    if (add.code !== 0) return fail("git add -A failed.")
   }
 
-  if (await hasConflicts()) Deno.exit(1)
+  if (await hasConflicts()) return fail("Merge conflicts remain after resolution.")
 
   if (await isMergeInProgress()) {
     const commit = await $`git commit --no-edit`.noThrow()
-    if (commit.code !== 0) Deno.exit(1)
+    if (commit.code !== 0) return fail("Merge commit failed.")
   }
 
-  Deno.exit(0)
+  return ok()
 }
