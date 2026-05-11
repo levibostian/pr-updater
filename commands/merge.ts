@@ -32,7 +32,7 @@ export const runMerge = async (options: MergeOptions): Promise<RunCommandResult>
   if (conflictsAfterMerge) {
     if (!resolveCmd) return fail("Merge conflicts detected. Provide --resolve-cmd to continue.")
 
-    const resolveCode = await $`bash -c ${resolveCmd}`.noThrow()
+    const resolveCode = await $`bash -c ${resolveCmd}`.stdout("inherit").stderr("inherit").noThrow()
     if (resolveCode.code !== 0) return fail("Resolve command failed.")
 
     const add = await $`git add -A`.noThrow()
