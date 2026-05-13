@@ -1,4 +1,4 @@
-import $ from "@david/dax"
+import { $ } from "../shell.ts"
 import { fail, ok, type RunCommandResult } from "./run_command_result.ts"
 
 type MergeOptions = {

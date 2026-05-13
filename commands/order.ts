@@ -1,4 +1,4 @@
-import $ from "@david/dax"
+import { $ } from "../shell.ts"
 import { buildStacks } from "./stack.ts"
 
 export type PullRequest = {

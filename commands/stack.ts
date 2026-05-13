@@ -1,4 +1,4 @@
-import $ from "@david/dax"
+import { $ } from "../shell.ts"
 
 export type PullRequest = {
   number: number
